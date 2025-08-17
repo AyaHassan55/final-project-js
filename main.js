@@ -1,6 +1,9 @@
+
+const baseUrl='https://tarmeezacademy.com/api/v1'
+
 function getPosts(){
 
-    axios.get('https://tarmeezacademy.com/api/v1/posts?limit=50',{
+    axios.get(`${baseUrl}/posts?limit=6`,{
 
     }).then((response)=>{
         response.data.data.forEach(post => {
@@ -43,3 +46,88 @@ function getPosts(){
     })
 }
 getPosts()
+
+function loginBtnClicked(){
+    // alert('hi')
+    const username =document.getElementById('username-input').value
+    const password =document.getElementById('pass-input').value
+    // console.log(username,password)
+    const params = {
+        "username":username,
+        "password":password
+    }
+    axios.post(`${baseUrl}/login`,params)
+    .then((response)=>{
+        localStorage.setItem('token',response.data.token)
+        // localStorage.setItem('user', response.data.user) // to can store it in localStorage you should convert it to string
+        localStorage.setItem('user',JSON.stringify(response.data.user))
+        // to close model after login
+
+        
+
+        const loginModel = document.getElementById('login-modal')
+        const modal = bootstrap.Modal.getInstance(loginModel)
+        modal.hide()
+        document.activeElement.blur() // يشيل الفوكس من الزرار
+
+        AlertLoginSuccess()
+        setUpUI()
+        // alert('Login Success')
+    })
+    .catch((err)=>{
+        alert(err)
+    })
+}
+function logout(){
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    alert('Logout Success')
+    setUpUI()
+}
+
+// function AlertLoginSuccess(){
+//     const alertPlaceholder = document.getElementById('success-alert')
+//     const appendAlert = (message, type) => {
+//         const wrapper = document.createElement('div')
+//         wrapper.innerHTML = [
+//             `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+//             `   <div>${message}</div>`,
+//             '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+//             '</div>'
+//         ].join('')
+
+//         alertPlaceholder.append(wrapper)
+//     }
+
+//     const alertTrigger = document.getElementById('liveAlertBtn')
+//     if (alertTrigger) {
+//         alertTrigger.addEventListener('click', () => {
+//             appendAlert('Nice, you triggered this alert message!', 'success')
+//         })
+//     }
+// }
+function AlertLoginSuccess(){
+    const alertPlaceholder = document.getElementById('success-alert')
+    const wrapper = document.createElement('div')
+    wrapper.innerHTML = `
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <div>Login Success 🎉</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `
+    alertPlaceholder.append(wrapper)
+}
+function setUpUI(){
+    const token = localStorage.getItem('token')
+    const loginDiv = document.getElementById('login-div')
+    const logoutDiv = document.getElementById('logout-div')
+
+    if(token == null){
+        logoutDiv.style.setProperty('display', 'none','important')
+        loginDiv.style.setProperty('display', 'flex','important')
+        
+    }else{
+        loginDiv.style.setProperty('display', 'none','important')
+        logoutDiv.style.setProperty('display', 'flex','important')
+    }
+}
