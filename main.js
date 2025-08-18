@@ -78,6 +78,31 @@ function loginBtnClicked(){
         alert(err)
     })
 }
+function registerBtnClicked(){
+    const username =document.getElementById('username-input').value
+    const name =document.getElementById('name-input').value
+    const email =document.getElementById('email-input').value
+    const password =document.getElementById('pass-input').value
+
+    const params = {
+        "username":username,
+        "name":name,
+        "email":email,  
+        'password':password
+    }
+    axios.post(`${baseUrl}/register`,params)
+    .then((response)=>{
+        localStorage.setItem('token',response.data.token)
+        localStorage.setItem('user',JSON.stringify(response.data.user))
+        // to close model after logout
+        const registerModel = document.getElementById('register-modal')
+        const modal = bootstrap.Modal.getInstance(registerModel)
+        modal.hide()
+        document.activeElement.blur() // يشيل الفوكس من الزرار
+        setUpUI()
+
+        })
+    }    
 function logout(){
     localStorage.removeItem('token')
     localStorage.removeItem('user')
@@ -85,27 +110,6 @@ function logout(){
     setUpUI()
 }
 
-// function AlertLoginSuccess(){
-//     const alertPlaceholder = document.getElementById('success-alert')
-//     const appendAlert = (message, type) => {
-//         const wrapper = document.createElement('div')
-//         wrapper.innerHTML = [
-//             `<div class="alert alert-${type} alert-dismissible" role="alert">`,
-//             `   <div>${message}</div>`,
-//             '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
-//             '</div>'
-//         ].join('')
-
-//         alertPlaceholder.append(wrapper)
-//     }
-
-//     const alertTrigger = document.getElementById('liveAlertBtn')
-//     if (alertTrigger) {
-//         alertTrigger.addEventListener('click', () => {
-//             appendAlert('Nice, you triggered this alert message!', 'success')
-//         })
-//     }
-// }
 function AlertLoginSuccess(){
     const alertPlaceholder = document.getElementById('success-alert')
     const wrapper = document.createElement('div')
@@ -116,6 +120,12 @@ function AlertLoginSuccess(){
         </div>
     `
     alertPlaceholder.append(wrapper)
+
+    setTimeout(() => {
+        const alertToHide = bootstrap.Alert.getOrCreateInstance('#success-alert')
+        alertToHide.close()
+    }, 2000)
+    
 }
 function setUpUI(){
     const token = localStorage.getItem('token')
