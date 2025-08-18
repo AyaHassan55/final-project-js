@@ -2,13 +2,13 @@
 const baseUrl='https://tarmeezacademy.com/api/v1'
 
 function getPosts(){
-
-    axios.get(`${baseUrl}/posts?limit=6`,{
+    console.log(`${baseUrl}/posts?limit=26`);
+    axios.get(`${baseUrl}/posts?limit=26`,{
 
     }).then((response)=>{
         response.data.data.forEach(post => {
             // document.getElementById('posts').innerHTML=''
-            let tagsHtml = '';
+            
             post.tags.forEach(tag =>{
                 tagsHtml += `<span class="tag">#${tag.name}</span> `;
             })
@@ -31,13 +31,27 @@ function getPosts(){
                                 <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z"/>
                             </svg>
                             <span>${post.comments_count} Comments</span>
-                            <div class="tags">
-                                ${tagsHtml}
-                            </div>
+                            <span id="post-tag-${post.id}" >
+                                    
+                            </span>
+            
                         </div>
                     </div>
-            `
-            document.getElementById('posts').innerHTML +=timeline;
+            `;
+            document.getElementById('posts').innerHTML +=timeline
+
+            const currentPostTagId= `post-tag-${post.id}`
+            document.getElementById(currentPostTagId).innerHTML=''
+            for(let tag of post.tags){
+                console.log(tag.name)
+                let tagContent =`
+                
+                    <button class="btn btn-sm rounded-5 " style="background-color: gray; color: white;">${tag.name}</button>
+                
+                `
+                document.getElementById(currentPostTagId).innerHTML += tagContent;
+            }
+            
         });
         
         // console.log(Response);
@@ -70,7 +84,7 @@ function loginBtnClicked(){
         modal.hide()
         document.activeElement.blur() // يشيل الفوكس من الزرار
 
-        AlertLoginSuccess()
+        AlertAuthSuccess('Login Success 🎉')
         setUpUI()
         // alert('Login Success')
     })
@@ -106,16 +120,18 @@ function registerBtnClicked(){
 function logout(){
     localStorage.removeItem('token')
     localStorage.removeItem('user')
-    alert('Logout Success')
+    
+    // AlertAuthSuccess('Logout Success 🎉')
     setUpUI()
 }
 
-function AlertLoginSuccess(){
+function AlertAuthSuccess(message){
     const alertPlaceholder = document.getElementById('success-alert')
+    // alertPlaceholder.innerHTML = '' // clear previous alerts
     const wrapper = document.createElement('div')
     wrapper.innerHTML = `
         <div class="alert alert-success alert-dismissible" role="alert">
-            <div>Login Success 🎉</div>
+            <div>${message}</div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     `
@@ -124,6 +140,8 @@ function AlertLoginSuccess(){
     setTimeout(() => {
         const alertToHide = bootstrap.Alert.getOrCreateInstance('#success-alert')
         alertToHide.close()
+
+        
     }, 2000)
     
 }
